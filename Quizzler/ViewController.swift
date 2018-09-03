@@ -12,6 +12,8 @@ class ViewController: UIViewController {
     
     let allQuestions = QuestionBank()
     var pickedAnswer: Bool = false
+    var questionNumber: Int =  0
+    var score: Int = 0
     
     @IBOutlet weak var questionLabel: UILabel!
     @IBOutlet weak var scoreLabel: UILabel!
@@ -21,8 +23,9 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let firstQuestion = allQuestions.list[0]
-        questionLabel.text = firstQuestion.questionText
+        nextQuestion()
+        updateUI()
+        
     }
 
 
@@ -35,33 +38,50 @@ class ViewController: UIViewController {
         }
         
         checkAnswer()
-    }
+        
+        questionNumber += 1
+        
+        nextQuestion()
+        
+        }
     
     
     func updateUI() {
-      
+        scoreLabel.text = "Score : \(score)"
+        progressLabel.text = "\(questionNumber + 1) / 13"
+        progressBar.frame.size.width = (view.frame.size.width / 13) * CGFloat(questionNumber + 1)
     }
     
 
     func nextQuestion() {
-        
+        if questionNumber <= 12 {
+            questionLabel.text = allQuestions.list[questionNumber].questionText
+            updateUI()
+        }
+        else {
+            let alert = UIAlertController(title: "End of Quiz", message: "You've reached the end of the quiz.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("Reset", comment: "Default action"), style: .default, handler: { _ in
+                self.startOver()
+            }))
+            self.present(alert, animated: true, completion: nil)
+            questionNumber = 0
+            score = 0
+        }
     }
     
     
     func checkAnswer() {
-        let correctAnswer = allQuestions.list[0].answer
+        let correctAnswer = allQuestions.list[questionNumber].answer
     
         if pickedAnswer == correctAnswer {
-            print("You got it!")
-        }
-        else {
-            print("Nope. Wrong! Fake news!")
+            score += 5
         }
     }
     
     
     func startOver() {
-       
+      questionNumber = 0
+        nextQuestion()
     }
     
 
